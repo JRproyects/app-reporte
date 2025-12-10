@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>ReportApp</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        background: #f8f9fa;
+        color: #2c3e50;
+        line-height: 1.6;
+        padding: 0;
+        margin: 0;
+      }
+
+      /* Header estilo Report & Run */
+      .app-header {
+        background: #2c3e50;
+        color: white;
+        padding: 15px 20px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .app-header h1 {
+        font-size: 1.4rem;
+        font-weight: 600;
+        letter-spacing: -0.5px;
+      }
+
+      .main-container {
+        margin-top: 60px;
+        padding: 0;
+        min-height: calc(100vh - 60px);
+      }
+
+      /* Navegación mejorada */
+      .tab-nav {
+        display: flex;
+        background: white;
+        border-bottom: 1px solid #e1e8ed;
+        position: sticky;
+        top: 60px;
+        z-index: 999;
+      }
+
+      .tab-button {
+        flex: 1;
+        padding: 16px;
+        background: none;
+        border: none;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #7f8c8d;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .tab-button.active {
+        color: #3498db;
+        font-weight: 600;
+      }
+
+      .tab-button.active::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 25%;
+        right: 25%;
+        height: 3px;
+        background: #3498db;
+        border-radius: 3px 3px 0 0;
+      }
+
+      .tab-content {
+        display: none;
+        padding: 0;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      /* Tarjetas estilo profesional */
+      .section-card {
+        background: white;
+        margin: 15px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+      }
+
+      .card-header {
+        padding: 20px;
+        border-bottom: 1px solid #ecf0f1;
+        background: #f8f9fa;
+      }
+
+      .card-header h2 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 5px;
+      }
+
+      .card-content {
+        padding: 20px;
+      }
+
+      /* Formularios mejorados */
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #34495e;
+        font-size: 0.95rem;
+      }
+
+      .form-input,
+      .form-select,
+      .form-textarea {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #e1e8ed;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+      }
+
+      .form-input:focus,
+      .form-select:focus,
+      .form-textarea:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+      }
+
+      .form-textarea {
+        min-height: 120px;
+        resize: vertical;
+        line-height: 1.5;
+      }
+
+      /* Botones estilo moderno */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        gap: 8px;
+      }
+
+      .btn-block {
+        display: flex;
+        width: 100%;
+      }
+
+      .btn-primary {
+        background: #3498db;
+        color: white;
+      }
+
+      .btn-primary:active {
+        background: #2980b9;
+        transform: translateY(1px);
+      }
+
+      .btn-success {
+        background: #27ae60;
+        color: white;
+      }
+
+      .btn-success:active {
+        background: #219653;
+        transform: translateY(1px);
+      }
+
+      .btn-outline {
+        background: transparent;
+        border: 2px solid #3498db;
+        color: #3498db;
+      }
+
+      /* Botones de acción flotantes */
+      .action-buttons {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 1000;
+      }
+
+      .fab {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: none;
+        background: #3498db;
+        color: white;
+        font-size: 1.2rem;
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .fab:active {
+        transform: scale(0.95);
+        box-shadow: 0 2px 8px rgba(52, 152, 219, 0.4);
+      }
+
+      .fab-camera {
+        background: #e74c3c;
+      }
+
+      /* Vista previa de imágenes estilo galería */
+      .image-section {
+        margin-top: 20px;
+      }
+
+      .image-preview-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .image-preview {
+        position: relative;
+        aspect-ratio: 1;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #ecf0f1;
+        border: 2px solid #e1e8ed;
+      }
+
+      .image-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .remove-image {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: rgba(231, 76, 60, 0.9);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .image-preview:hover .remove-image {
+        opacity: 1;
+      }
+
+      /* Lista de informes estilo profesional */
+      .report-list {
+        padding: 15px;
+      }
+
+      .report-item {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border-left: 4px solid #3498db;
+      }
+
+      .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+      }
+
+      .report-title {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+      }
+
+      .report-date {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+      }
+
+      .report-category {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+
+      .category-urgent {
+        background: #ffeaa7;
+        color: #e17055;
+      }
+
+      .category-medium {
+        background: #81ecec;
+        color: #00b894;
+      }
+
+      .category-low {
+        background: #a29bfe;
+        color: #6c5ce7;
+      }
+
+      .report-description {
+        color: #34495e;
+        line-height: 1.5;
+        margin-bottom: 15px;
+        white-space: pre-wrap;
+      }
+
+      .report-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      /* Estados vacíos */
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #7f8c8d;
+      }
+
+      .empty-state-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+        opacity: 0.5;
+      }
+
+      .empty-state h3 {
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+        color: #2c3e50;
+      }
+
+      .empty-state p {
+        font-size: 1rem;
+        line-height: 1.5;
+      }
+
+      /* Modal para cámara */
+      .camera-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.9);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        padding: 20px;
+      }
+
+      .camera-modal.show {
+        display: flex;
+      }
+
+      .camera-container {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        max-width: 400px;
+        width: 100%;
+        text-align: center;
+      }
+
+      .camera-preview {
+        width: 100%;
+        height: 300px;
+        background: #ecf0f1;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #7f8c8d;
+        font-size: 1rem;
+        overflow: hidden;
+      }
+
+      .camera-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+      }
+
+      /* Notificaciones */
+      .notification {
+        position: fixed;
+        top: 80px;
+        left: 20px;
+        right: 20px;
+        background: #27ae60;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        z-index: 1001;
+        transform: translateY(-100px);
+        opacity: 0;
+        transition: all 0.3s ease;
+      }
+
+      .notification.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      .notification.error {
+        background: #e74c3c;
+      }
+
+      .notification.warning {
+        background: #f39c12;
+      }
+
+      /* Input file personalizado */
+      .file-input-container {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+      }
+
+      .file-input-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 14px 20px;
+        background: #3498db;
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+      }
+
+      .file-input-label:active {
+        background: #2980b9;
+        transform: translateY(1px);
+      }
+
+      .file-input {
+        position: absolute;
+        left: -9999px;
+        opacity: 0;
+      }
+
+      /* Badge de localización */
+      .location-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        background: #d6eaf8;
+        color: #2874a6;
+      }
+
+      /* Loading spinner */
+      .spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+        margin-right: 8px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header estilo Report & Run -->
+    <header class="app-header">
+      <h1>📱 Report & Run</h1>
+    </header>
+
+    <!-- Contenedor principal -->
+    <div class="main-container">
+      <!-- Navegación -->
+      <nav class="tab-nav">
+        <button class="tab-button active" data-tab="create">
+          Nuevo Informe
+        </button>
+        <button class="tab-button" data-tab="reports">Mis Informes</button>
+      </nav>
+
+      <!-- Crear informe -->
+      <section id="create" class="tab-content active">
+        <div class="section-card">
+          <div class="card-header">
+            <h2>Crear Nuevo Reporte</h2>
+            <p style="color: #7f8c8d; font-size: 0.9rem">
+              Documenta problemas y genera reportes profesionales
+            </p>
+          </div>
+          <div class="card-content">
+            <form id="reportForm">
+              <div class="form-group">
+                <label class="form-label" for="title">Título del Reporte</label>
+                <input
+                  type="text"
+                  class="form-input"
+                  id="title"
+                  required
+                  placeholder="Ej: Daño en mampostería, Problema estructural..."
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="location">Localización</label>
+                <select class="form-select" id="location" required>
+                  <option value="">Seleccionar localización</option>
+                  <option value="ingenieria">🏗️ Ingeniería</option>
+                  <option value="informes">📊 Informes</option>
+                  <option value="administracion">💼 Administración</option>
+                  <option value="mantenimiento">🔧 Mantenimiento</option>
+                  <option value="calidad">✅ Control de Calidad</option>
+                  <option value="produccion">🏭 Producción</option>
+                  <option value="logistica">🚚 Logística</option>
+                  <option value="rrhh">👥 Recursos Humanos</option>
+                  <option value="it">💻 Tecnología</option>
+                  <option value="seguridad">🛡️ Seguridad</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="category"
+                  >Categoría de Prioridad</label
+                >
+                <select class="form-select" id="category" required>
+                  <option value="">Seleccionar categoría</option>
+                  <option value="urgent">🔴 Urgente (Crítico)</option>
+                  <option value="medium">🟡 Medio (Importante)</option>
+                  <option value="low">🟢 Bajo (Rutina)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="description"
+                  >Descripción Detallada</label
+                >
+                <textarea
+                  class="form-textarea"
+                  id="description"
+                  required
+                  placeholder="Describe el problema encontrado, ubicación específica, condiciones observadas..."
+                ></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Evidencia Fotográfica</label>
+                <div class="file-input-container">
+                  <label class="file-input-label" for="imageInput">
+                    📸 Agregar Fotos desde Galería
+                  </label>
+                  <input
+                    type="file"
+                    class="file-input"
+                    id="imageInput"
+                    accept="image/*"
+                    multiple
+                  />
+                </div>
+                <div class="image-preview-grid" id="imagePreview"></div>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-block">
+                💾 Guardar Reporte
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- Ver informes -->
+      <section id="reports" class="tab-content">
+        <div class="report-list" id="reportsList">
+          <!-- Los informes se cargarán aquí dinámicamente -->
+        </div>
+      </section>
+    </div>
+
+    <!-- Botones de acción flotantes -->
+    <div class="action-buttons">
+      <button
+        class="fab fab-camera"
+        onclick="openCamera()"
+        title="Tomar Foto con Cámara"
+      >
+        📷
+      </button>
+    </div>
+
+    <!-- Modal de cámara -->
+    <div class="camera-modal" id="cameraModal">
+      <div class="camera-container">
+        <h3 style="margin-bottom: 20px; color: #2c3e50">Tomar Foto</h3>
+        <div class="camera-preview" id="cameraPreview">
+          <div style="text-align: center">
+            <div style="font-size: 3rem; margin-bottom: 10px">📷</div>
+            <div>Iniciando cámara...</div>
+          </div>
+        </div>
+        <div class="camera-actions">
+          <button class="btn btn-outline" onclick="closeCamera()">
+            Cancelar
+          </button>
+          <button
+            class="btn btn-primary"
+            onclick="capturePhoto()"
+            id="captureBtn"
+          >
+            <span
+              class="spinner"
+              id="captureSpinner"
+              style="display: none"
+            ></span>
+            Capturar Foto
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para ver imágenes -->
+    <div class="camera-modal" id="imageModal">
+      <button
+        class="fab"
+        onclick="closeModal()"
+        style="position: absolute; top: 20px; right: 20px; background: #e74c3c"
+      >
+        ×
+      </button>
+      <img
+        id="modalImage"
+        src=""
+        alt="Imagen ampliada"
+        style="max-width: 90%; max-height: 80%; border-radius: 8px"
+      />
+    </div>
+
+    <!-- Notificación -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+      // Variables globales
+      let selectedImages = [];
+      let reports = JSON.parse(localStorage.getItem("reports")) || [];
+      let currentStream = null;
+      let isCordova = false;
+
+      // Inicialización
+      document.addEventListener("DOMContentLoaded", function () {
+        initializeApp();
+      });
+
+      document.addEventListener(
+        "deviceready",
+        function () {
+          console.log("Cordova está listo");
+          isCordova = true;
+          initializeApp();
+          initializePermissions(); // ← AÑADE ESTA LÍNEA
+        },
+        false
+      );
+
+      function initializeApp() {
+        setupTabNavigation();
+        setupForm();
+        setupImageInput();
+        loadReports();
+      }
+
+      // Solicitar permisos de cámara en Cordova
+      function requestCameraPermission() {
+        if (!isCordova) return;
+
+        try {
+          if (navigator.camera) {
+            // Los permisos se manejan automáticamente en versiones recientes
+            console.log("Cámara disponible en Cordova");
+          }
+        } catch (error) {
+          console.error("Error con la cámara de Cordova:", error);
+        }
+      }
+
+      function setupTabNavigation() {
+        const tabButtons = document.querySelectorAll(".tab-button");
+
+        tabButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            tabButtons.forEach((btn) => btn.classList.remove("active"));
+            this.classList.add("active");
+
+            const tabId = this.getAttribute("data-tab");
+            document.querySelectorAll(".tab-content").forEach((content) => {
+              content.classList.remove("active");
+            });
+            document.getElementById(tabId).classList.add("active");
+
+            if (tabId === "reports") {
+              loadReports();
+            }
+          });
+        });
+      }
+
+      function setupForm() {
+        const form = document.getElementById("reportForm");
+
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const title = document.getElementById("title").value.trim();
+          const location = document.getElementById("location").value;
+          const category = document.getElementById("category").value;
+          const description = document
+            .getElementById("description")
+            .value.trim();
+
+          if (!title || !location || !category || !description) {
+            showNotification("Completa todos los campos requeridos", true);
+            return;
+          }
+
+          const newReport = {
+            id: Date.now(),
+            title: title,
+            location: location,
+            category: category,
+            description: description,
+            date: new Date().toLocaleString("es-ES"),
+            images: [...selectedImages],
+          };
+
+          reports.push(newReport);
+          localStorage.setItem("reports", JSON.stringify(reports));
+
+          form.reset();
+          selectedImages = [];
+          document.getElementById("imagePreview").innerHTML = "";
+
+          showNotification("✅ Reporte guardado exitosamente");
+          document.querySelector('[data-tab="reports"]').click();
+        });
+      }
+
+      function setupImageInput() {
+        const imageInput = document.getElementById("imageInput");
+
+        imageInput.addEventListener("change", function (e) {
+          const files = e.target.files;
+          processImageFiles(files);
+          imageInput.value = "";
+        });
+      }
+
+      function processImageFiles(files) {
+        for (let file of files) {
+          if (!file.type.startsWith("image/")) {
+            showNotification("Solo se permiten archivos de imagen", true);
+            continue;
+          }
+
+          if (file.size > 5 * 1024 * 1024) {
+            showNotification(
+              "La imagen es demasiado grande (máximo 5MB)",
+              true
+            );
+            continue;
+          }
+
+          const reader = new FileReader();
+
+          reader.onload = function (e) {
+            selectedImages.push(e.target.result);
+            updateImagePreview();
+          };
+
+          reader.onerror = function () {
+            showNotification("Error al cargar la imagen", true);
+          };
+
+          reader.readAsDataURL(file);
+        }
+      }
+
+      function updateImagePreview() {
+        const previewContainer = document.getElementById("imagePreview");
+        previewContainer.innerHTML = "";
+
+        selectedImages.forEach((image, index) => {
+          const previewDiv = document.createElement("div");
+          previewDiv.className = "image-preview";
+
+          const img = document.createElement("img");
+          img.src = image;
+          img.alt = `Evidencia ${index + 1}`;
+          img.onclick = () => viewImage(image);
+
+          const removeBtn = document.createElement("button");
+          removeBtn.className = "remove-image";
+          removeBtn.innerHTML = "×";
+          removeBtn.onclick = (e) => {
+            e.stopPropagation();
+            removeImage(index);
+          };
+
+          previewDiv.appendChild(img);
+          previewDiv.appendChild(removeBtn);
+          previewContainer.appendChild(previewDiv);
+        });
+      }
+
+      function removeImage(index) {
+        selectedImages.splice(index, 1);
+        updateImagePreview();
+      }
+
+      function loadReports() {
+        const reportsList = document.getElementById("reportsList");
+        reports = JSON.parse(localStorage.getItem("reports")) || [];
+
+        if (reports.length === 0) {
+          reportsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <h3>No hay reportes guardados</h3>
+                        <p>Crea tu primer reporte usando el botón "Nuevo Informe"</p>
+                    </div>
+                `;
+          return;
+        }
+
+        reports.sort((a, b) => b.id - a.id);
+
+        let html = "";
+        reports.forEach((report) => {
+          const categoryClass = `category-${report.category}`;
+          const categoryText =
+            {
+              urgent: "🔴 Urgente",
+              medium: "🟡 Medio",
+              low: "🟢 Bajo",
+            }[report.category] || "Sin categoría";
+
+          const locationText =
+            {
+              ingenieria: "🏗️ Ingeniería",
+              informes: "📊 Informes",
+              administracion: "💼 Administración",
+              mantenimiento: "🔧 Mantenimiento",
+              calidad: "✅ Control de Calidad",
+              produccion: "🏭 Producción",
+              logistica: "🚚 Logística",
+              rrhh: "👥 Recursos Humanos",
+              it: "💻 Tecnología",
+              seguridad: "🛡️ Seguridad",
+            }[report.location] || "📍 Sin localización";
+
+          html += `
+                    <div class="report-item">
+                        <div class="report-header">
+                            <div>
+                                <div class="report-title">${report.title}</div>
+                                <div class="report-date">${report.date}</div>
+                            </div>
+                            <span class="report-category ${categoryClass}">${categoryText}</span>
+                        </div>
+                        <div class="location-badge">${locationText}</div>
+                        <div class="report-description">${
+                          report.description
+                        }</div>
+                        ${
+                          report.images && report.images.length > 0
+                            ? `
+                            <div class="image-preview-grid">
+                                ${report.images
+                                  .map(
+                                    (img, idx) => `
+                                    <div class="image-preview">
+                                        <img src="${img}" alt="Evidencia ${
+                                      idx + 1
+                                    }" onclick="viewImage('${img.replace(
+                                      /'/g,
+                                      "\\'"
+                                    )}')">
+                                    </div>
+                                `
+                                  )
+                                  .join("")}
+                            </div>
+                        `
+                            : ""
+                        }
+                        <div class="report-actions">
+                            <button class="btn btn-success" onclick="generatePDF(${
+                              report.id
+                            })">
+                                📄 Generar PDF
+                            </button>
+                        </div>
+                    </div>
+                `;
+        });
+
+        reportsList.innerHTML = html;
+      }
+
+      // Funciones de cámara MEJORADAS
+      function openCamera() {
+        if (isCordova) {
+          openCordovaCamera();
+        } else {
+          openBrowserCamera();
+        }
+      }
+
+      function openCordovaCamera() {
+        if (!navigator.camera) {
+          showNotification(
+            "La cámara no está disponible en este dispositivo",
+            true
+          );
+          return;
+        }
+
+        const cameraOptions = {
+          quality: 50,
+          destinationType: Camera.DestinationType.DATA_URL,
+          encodingType: Camera.EncodingType.JPEG,
+          mediaType: Camera.MediaType.PICTURE,
+          correctOrientation: true,
+          saveToPhotoAlbum: false,
+        };
+
+        navigator.camera.getPicture(
+          function (imageData) {
+            // Éxito: convertir base64 a data URL
+            const imageSrc = "data:image/jpeg;base64," + imageData;
+            selectedImages.push(imageSrc);
+            updateImagePreview();
+            showNotification("✅ Foto capturada exitosamente");
+          },
+          function (error) {
+            console.error("Error cámara Cordova:", error);
+            showNotification("Error al acceder a la cámara: " + error, true);
+          },
+          cameraOptions
+        );
+      }
+
+      function openBrowserCamera() {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          navigator.mediaDevices
+            .getUserMedia({ video: true })
+            .then(function (stream) {
+              currentStream = stream;
+              const video = document.createElement("video");
+              video.srcObject = stream;
+              video.autoplay = true;
+              video.style.width = "100%";
+              video.style.height = "100%";
+              video.style.objectFit = "cover";
+
+              const preview = document.getElementById("cameraPreview");
+              preview.innerHTML = "";
+              preview.appendChild(video);
+              document.getElementById("cameraModal").classList.add("show");
+            })
+            .catch(function (error) {
+              console.error("Error accediendo a la cámara:", error);
+              showNotification(
+                "No se pudo acceder a la cámara. Verifica los permisos.",
+                true
+              );
+            });
+        } else {
+          showNotification(
+            "La cámara no está disponible en este navegador",
+            true
+          );
+        }
+      }
+
+      function closeCamera() {
+        if (currentStream) {
+          currentStream.getTracks().forEach((track) => track.stop());
+          currentStream = null;
+        }
+        document.getElementById("cameraModal").classList.remove("show");
+      }
+
+      function capturePhoto() {
+        if (isCordova) {
+          // En Cordova, ya se maneja con openCordovaCamera
+          return;
+        }
+
+        const video = document.querySelector("#cameraPreview video");
+        if (video) {
+          const canvas = document.createElement("canvas");
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          const context = canvas.getContext("2d");
+          context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+          const imageData = canvas.toDataURL("image/jpeg");
+          selectedImages.push(imageData);
+          updateImagePreview();
+
+          closeCamera();
+          showNotification("✅ Foto capturada exitosamente");
+        }
+      }
+
+      function viewImage(imageSrc) {
+        document.getElementById("modalImage").src = imageSrc;
+        document.getElementById("imageModal").classList.add("show");
+      }
+
+      function closeModal() {
+        document.getElementById("imageModal").classList.remove("show");
+      }
+      const permissions = cordova.plugins.permissions;
+      permissions.requestPermissions(
+        [
+          permissions.READ_EXTERNAL_STORAGE,
+          permissions.WRITE_EXTERNAL_STORAGE,
+          permissions.READ_MEDIA_IMAGES,
+          permissions.READ_MEDIA_VIDEO,
+          permissions.READ_MEDIA_AUDIO,
+        ],
+        () => console.log("Permisos concedidos"),
+        () => console.log("Permisos denegados")
+      );
+
+      async function generatePDF() {
+        const nombre = document.getElementById("nombre").value;
+        const descripcion = document.getElementById("descripcion").value;
+
+        if (!nombre || !descripcion) {
+          alert("Complete todos los campos.");
+          return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF();
+
+        pdf.setFontSize(18);
+        pdf.text("Reporte", 10, 20);
+
+        pdf.setFontSize(12);
+        pdf.text("Nombre: " + nombre, 10, 40);
+        pdf.text("Descripción: " + descripcion, 10, 50);
+
+        if (photoData) {
+          pdf.addImage(photoData, "JPEG", 10, 70, 100, 100);
+        }
+
+        const pdfOutput = pdf.output("arraybuffer");
+        const blob = new Blob([pdfOutput], { type: "application/pdf" });
+        savePDF(blob);
+      }
+
+      function savePDF(blob) {
+        const fileName = "reporte_" + Date.now() + ".pdf";
+
+        window.resolveLocalFileSystemURL(
+          cordova.file.externalRootDirectory + "Download/",
+          function (dir) {
+            dir.getFile(
+              fileName,
+              { create: true },
+              function (file) {
+                file.createWriter(
+                  function (writer) {
+                    writer.write(blob);
+                    alert("PDF guardado en Descargas!");
+
+                    // abrir PDF
+                    cordova.plugins.fileOpener2.open(
+                      file.nativeURL,
+                      "application/pdf",
+                      { error: (e) => alert("No se pudo abrir: " + e) }
+                    );
+                  },
+                  function () {
+                    alert("Error al escribir archivo");
+                  }
+                );
+              },
+              function () {
+                alert("Error al crear archivo");
+              }
+            );
+          },
+          function () {
+            alert("No se puede acceder al directorio /Download");
+          }
+        );
+      }
+      //desde aca va la ultima parte.
+
+      function savePDFToDevice(doc, fileName) {
+        try {
+          // Generar el PDF como array buffer
+          const pdfOutput = doc.output("arraybuffer");
+
+          // Solicitar permisos de almacenamiento
+          if (cordova.plugins && cordova.plugins.permissions) {
+            cordova.plugins.permissions.requestPermission(
+              cordova.plugins.permissions.WRITE_EXTERNAL_STORAGE,
+              function (status) {
+                if (status.hasPermission) {
+                  writePDFToFile(pdfOutput, fileName);
+                } else {
+                  showNotification(
+                    "Se necesitan permisos de almacenamiento para guardar el PDF",
+                    true
+                  );
+                }
+              },
+              function (error) {
+                console.error("Error solicitando permisos:", error);
+                // Intentar sin permisos
+                writePDFToFile(pdfOutput, fileName);
+              }
+            );
+          } else {
+            // Si no hay plugin de permisos, intentar directamente
+            writePDFToFile(pdfOutput, fileName);
+          }
+        } catch (error) {
+          console.error("Error en savePDFToDevice:", error);
+          // Fallback: descargar normalmente
+          doc.save(fileName);
+          showNotification("PDF generado (método alternativo)");
+        }
+      }
+
+      function writePDFToFile(pdfArrayBuffer, fileName) {
+        try {
+          // Convertir array buffer a blob
+          const blob = new Blob([pdfArrayBuffer], { type: "application/pdf" });
+
+          // Guardar en almacenamiento externo
+          window.resolveLocalFileSystemURL(
+            cordova.file.externalRootDirectory + "Download/",
+            function (dirEntry) {
+              dirEntry.getFile(
+                fileName,
+                { create: true, exclusive: false },
+                function (fileEntry) {
+                  fileEntry.createWriter(
+                    function (fileWriter) {
+                      fileWriter.onwriteend = function () {
+                        showNotification(
+                          "✅ PDF guardado en Carpeta de Descargas"
+                        );
+                        console.log("PDF guardado en: " + fileEntry.toURL());
+                      };
+
+                      fileWriter.onerror = function (e) {
+                        console.error("Error escribiendo archivo:", e);
+                        showNotification("Error guardando el archivo", true);
+                      };
+
+                      fileWriter.write(blob);
+                    },
+                    function (error) {
+                      console.error("Error creando writer:", error);
+                      showNotification("Error creando archivo PDF", true);
+                    }
+                  );
+                },
+                function (error) {
+                  console.error("Error creando archivo:", error);
+                  showNotification(
+                    "Error creando archivo en el dispositivo",
+                    true
+                  );
+                }
+              );
+            },
+
+            function (error) {
+              console.error("Error accediendo a Download:", error);
+              // Intentar en directorio de datos
+              window.resolveLocalFileSystemURL(
+                cordova.file.dataDirectory,
+                function (dirEntry) {
+                  dirEntry.getFile(
+                    fileName,
+                    { create: true, exclusive: false },
+                    function (fileEntry) {
+                      fileEntry.createWriter(function (fileWriter) {
+                        fileWriter.onwriteend = function () {
+                          showNotification(
+                            "✅ PDF guardado en almacenamiento interno"
+                          );
+                        };
+                        fileWriter.onerror = function (e) {
+                          console.error("Error escribiendo archivo:", e);
+                          showNotification("Error guardando PDF", true);
+                        };
+                        fileWriter.write(blob);
+                      });
+                    }
+                  );
+                },
+                function (error) {
+                  console.error("Error accediendo a dataDirectory:", error);
+                  showNotification(
+                    "No se pudo guardar el PDF en el dispositivo",
+                    true
+                  );
+                }
+              );
+            }
+          );
+        } catch (error) {
+          console.error("Error en writePDFToFile:", error);
+          showNotification("Error al guardar el PDF en el dispositivo", true);
+        }
+      }
+      async function savePDFToDownloads(filename, pdfBlob) {
+        const path = cordova.file.externalRootDirectory + "Download/";
+
+        window.resolveLocalFileSystemURL(path, function (dir) {
+          dir.getFile(filename, { create: true }, function (file) {
+            file.createWriter(
+              function (fileWriter) {
+                fileWriter.write(pdfBlob);
+
+                // Abrir PDF
+                cordova.plugins.fileOpener2.open(
+                  path + filename,
+                  "application/pdf",
+                  {
+                    success: function () {
+                      showNotification("📄 PDF guardado en Descargas");
+                    },
+                    error: function (e) {
+                      console.log("Error abriendo PDF:", e);
+                    },
+                  }
+                );
+              },
+              function (err) {
+                console.log("Error creando archivo:", err);
+              }
+            );
+          });
+        });
+      }
+
+      // Función para verificar y solicitar permisos al iniciar la app
+      function initializePermissions() {
+        if (!window.cordova) return;
+
+        // Solicitar permisos de cámara
+        if (navigator.camera) {
+          // Los permisos se solicitan automáticamente al usar la cámara
+          console.log("Cámara disponible");
+        }
+
+        // Solicitar permisos de almacenamiento si el plugin está disponible
+        if (cordova.plugins && cordova.plugins.permissions) {
+          cordova.plugins.permissions.requestPermission(
+            cordova.plugins.permissions.WRITE_EXTERNAL_STORAGE,
+            function (status) {
+              if (status.hasPermission) {
+                console.log("Permisos de almacenamiento concedidos");
+              } else {
+                console.log("Permisos de almacenamiento denegados");
+              }
+            },
+            function (error) {
+              console.error(
+                "Error solicitando permisos de almacenamiento:",
+                error
+              );
+            }
+          );
+        }
+      }
+      // Event listeners
+      document
+        .getElementById("imageModal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) closeModal();
+        });
+
+      // Inicializar si Cordova no está disponible
+      if (!window.cordova) {
+        setTimeout(initializeApp, 100);
+      }
+    </script>
+  </body>
+</html>

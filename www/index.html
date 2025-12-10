@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta
+      name="viewport"
+      content="initial-scale=1, width=device-width, viewport-fit=cover"
+    />
+    <title>Inspecciones App</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      :root {
+        --primary-color: #d20707;
+        --secondary-color: #79101e;
+        --accent-color: #e74c3c;
+        --success-color: #27ae60;
+        --warning-color: #f39c12;
+        --light-color: #ecf0f1;
+        --dark-color: #2c3e50;
+        --text-color: #2c3e50;
+        --border-color: #bdc3c7;
+        --card-bg: #ffffff;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        background: var(--light-color);
+        color: var(--text-color);
+        line-height: 1.6;
+      }
+
+      .app-header {
+        background: var(--primary-color);
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        margin-right: 15px;
+      }
+
+      .logo {
+        font-size: 24px;
+        font-weight: bold;
+        background: white;
+        color: var(--primary-color);
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+      }
+
+      .app-header h1 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        letter-spacing: -0.5px;
+      }
+
+      .tab-nav {
+        display: flex;
+        background: white;
+        border-bottom: 1px solid var(--border-color);
+        overflow-x: auto;
+      }
+
+      .tab-button {
+        flex: 1;
+        min-width: 120px;
+        padding: 16px 12px;
+        background: none;
+        border: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #7f8c8d;
+        transition: all 0.3s ease;
+        position: relative;
+        white-space: nowrap;
+      }
+
+      .tab-button.active {
+        color: var(--secondary-color);
+        font-weight: 600;
+      }
+
+      .tab-button.active::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 15%;
+        right: 15%;
+        height: 3px;
+        background: var(--secondary-color);
+        border-radius: 3px 3px 0 0;
+      }
+
+      .tab-content {
+        display: none;
+        padding: 20px;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .form-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      .form-card h2 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--dark-color);
+        font-size: 0.95rem;
+      }
+
+      .form-input,
+      .form-select {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+      }
+
+      .form-input:focus,
+      .form-select:focus {
+        outline: none;
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+      }
+
+      .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 16px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        gap: 8px;
+        margin-bottom: 15px;
+      }
+
+      .btn-primary {
+        background: var(--secondary-color);
+        color: white;
+      }
+
+      .btn-primary:active {
+        background: #2980b9;
+        transform: translateY(1px);
+      }
+
+      .btn-success {
+        background: var(--success-color);
+        color: white;
+      }
+
+      .btn-success:active {
+        background: #219653;
+        transform: translateY(1px);
+      }
+
+      .btn-warning {
+        background: var(--warning-color);
+        color: white;
+      }
+
+      .btn-warning:active {
+        background: #e67e22;
+        transform: translateY(1px);
+      }
+
+      .photo-preview-container {
+        margin-top: 20px;
+        text-align: center;
+      }
+
+      .photo-preview {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border: 3px solid var(--border-color);
+        display: none;
+      }
+
+      .preview-label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: var(--dark-color);
+        font-size: 1rem;
+      }
+
+      .image-gallery {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .gallery-image {
+        width: 100%;
+        aspect-ratio: 1;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 2px solid var(--border-color);
+        cursor: pointer;
+        transition: transform 0.3s ease;
+      }
+
+      .gallery-image:active {
+        transform: scale(0.95);
+      }
+
+      .remove-image {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: rgba(231, 76, 60, 0.9);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .image-container {
+        position: relative;
+      }
+
+      .image-container:hover .remove-image {
+        opacity: 1;
+      }
+
+      .file-input-container {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+      }
+
+      .file-input-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 14px 20px;
+        background: var(--secondary-color);
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+      }
+
+      .file-input-label:active {
+        background: #2980b9;
+        transform: translateY(1px);
+      }
+
+      .file-input {
+        position: absolute;
+        left: -9999px;
+        opacity: 0;
+      }
+
+      .notification {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        right: 20px;
+        background: var(--success-color);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        transform: translateY(-100px);
+        opacity: 0;
+        transition: all 0.3s ease;
+        text-align: center;
+      }
+
+      .notification.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      .notification.error {
+        background: var(--accent-color);
+      }
+
+      .browser-download {
+        margin-top: 10px;
+        padding: 10px;
+        background: #e8f4fd;
+        border-radius: 8px;
+        text-align: center;
+        display: none;
+      }
+
+      .download-link {
+        color: var(--secondary-color);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .debug-info {
+        font-size: 12px;
+        color: #7f8c8d;
+        margin-top: 10px;
+        text-align: center;
+      }
+
+      .reports-list {
+        margin-top: 15px;
+      }
+
+      .report-item {
+        background: white;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        border-left: 4px solid var(--secondary-color);
+      }
+
+      .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .report-title {
+        font-weight: 600;
+        font-size: 1rem;
+      }
+
+      .report-date {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+      }
+
+      .report-details {
+        font-size: 0.9rem;
+        color: #555;
+        margin-bottom: 8px;
+      }
+
+      .report-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .action-btn {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .view-btn {
+        background: var(--secondary-color);
+        color: white;
+      }
+
+      .delete-btn {
+        background: var(--accent-color);
+        color: white;
+      }
+
+      .urgency-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: 8px;
+      }
+
+      .urgency-low {
+        background: #d4efdf;
+        color: #27ae60;
+      }
+
+      .urgency-medium {
+        background: #fdebd0;
+        color: #f39c12;
+      }
+
+      .urgency-high {
+        background: #fadbd8;
+        color: #e74c3c;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #7f8c8d;
+      }
+
+      .empty-state-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+        opacity: 0.5;
+      }
+    </style>
+    <style>
+      /* Estilos específicos para impresión (vista similar al PDF adjunto) */
+      @page { size: A4; margin: 12mm; }
+      @media print {
+        body { background: white; color: #222; }
+        .no-print { display: none !important; }
+      }
+
+      .print-report {
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0 auto;
+        position: relative;
+        background: white;
+        box-sizing: border-box;
+        padding: 8mm 12mm 18mm 12mm;
+        page-break-after: always;
+      }
+
+      .print-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #000;
+        padding-bottom: 6px;
+      }
+
+      .print-header .left, .print-header .right {
+        width: 120px;
+      }
+
+      .print-title {
+        position: absolute;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-weight: 700;
+        font-size: 20px;
+      }
+
+      .print-sector-bar {
+        margin-top: 6px;
+        height: 20px;
+        background: #c91212;
+        color: white;
+        text-align: center;
+        line-height: 20px;
+        font-weight: 700;
+        border: 2px solid #7a0505;
+      }
+
+      .print-watermark {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -45%);
+        opacity: 0.06;
+        max-width: 70%;
+        max-height: 70%;
+        pointer-events: none;
+      }
+
+      .print-content {
+        margin-top: 60px;
+      }
+
+      .print-images img {
+        display: block;
+        margin: 8px auto;
+        max-width: 160mm;
+        height: auto;
+        border: 1px solid #ddd;
+      }
+
+      .print-footer {
+        position: absolute;
+        left: 12mm;
+        right: 12mm;
+        bottom: 12mm;
+        border-top: 1px solid #999;
+        padding-top: 6px;
+        font-size: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .print-footer .center-note {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 6mm;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app-header">
+      <div class="logo-container">
+        <img src="img/logo-BM-2.png" alt="Logo Inspecciones" class="logo" />
+      </div>
+      <h1>REPORTES BM </h1>
+    </div>
+      <button class="tab-button active" data-tab="camera">Generar nuevo reporte:</button>
+
+    <nav class="tab-nav">
+      <button class="tab-button active" data-tab="camera">Nuevo Reporte</button>
+      <button class="tab-button" data-tab="gallery">Desde Galería</button>
+      <button class="tab-button" data-tab="reports">Mis Informes</button>
+    </nav>
+
+    <section id="camera" class="tab-content active">
+      <div class="form-card">
+        <h2>Crear Nuevo Reporte</h2>
+
+        <div class="form-group">
+          <label class="form-label" for="nombre">Título del Reporte:</label>
+          <input
+            type="text"
+            class="form-input"
+            id="nombre"
+            placeholder="Ingrese el título del reporte"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="sector">Sector:</label>
+          <select class="form-select" id="sector">
+            <option value="">Seleccione un sector</option>
+            <option value="ingenieria">Ingeniería</option>
+            <option value="seguridad">Seguridad</option>
+            <option value="mantenimiento">Mantenimiento</option>
+            <option value="calidad">Calidad</option>
+            <option value="operaciones">Operaciones</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="urgencia">Nivel de Urgencia:</label>
+          <select class="form-select" id="urgencia">
+            <option value="baja">Baja</option>
+            <option value="media">Media</option>
+            <option value="alta">Alta</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="descripcion">Descripción:</label>
+          <textarea
+            class="form-input"
+            id="descripcion"
+            placeholder="Ingrese la descripción del reporte"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <button class="btn btn-primary" onclick="takePhoto()">
+          📸 Tomar Foto
+        </button>
+
+        <div class="photo-preview-container">
+          <span class="preview-label">Vista Previa:</span>
+          <img class="photo-preview" id="photoPreview" />
+        </div>
+
+        <button class="btn btn-success" onclick="generatePDF()">
+          📄 Generar y Guardar PDF
+        </button>
+
+        <div class="browser-download" id="browserDownload">
+          <p>
+            PDF generado.
+            <a href="#" class="download-link" id="downloadLink"
+              >Haz clic aquí para descargar</a
+            >
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="gallery" class="tab-content">
+      <div class="form-card">
+        <h2>Crear Reporte desde Galería</h2>
+
+        <div class="form-group">
+          <label class="form-label" for="nombreGallery"
+            >Título del Reporte:</label
+          >
+          <input
+            type="text"
+            class="form-input"
+            id="nombreGallery"
+            placeholder="Ingrese el título del reporte"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="sectorGallery">Sector:</label>
+          <select class="form-select" id="sectorGallery">
+            <option value="">Seleccione un sector</option>
+            <option value="ingenieria">Ingeniería</option>
+            <option value="seguridad">Seguridad</option>
+            <option value="mantenimiento">Mantenimiento</option>
+            <option value="calidad">Calidad</option>
+            <option value="operaciones">Operaciones</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="urgenciaGallery"
+            >Nivel de Urgencia:</label
+          >
+          <select class="form-select" id="urgenciaGallery">
+            <option value="baja">Baja</option>
+            <option value="media">Media</option>
+            <option value="alta">Alta</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="descripcionGallery"
+            >Descripción:</label
+          >
+          <textarea
+            class="form-input"
+            id="descripcionGallery"
+            placeholder="Ingrese la descripción del reporte"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="file-input-container">
+          <label class="file-input-label" for="galleryInput">
+            🖼️ Seleccionar Imágenes
+          </label>
+          <input
+            type="file"
+            class="file-input"
+            id="galleryInput"
+            accept="image/*"
+            multiple
+          />
+        </div>
+
+        <div class="image-gallery" id="imageGallery">
+          <!-- Las imágenes seleccionadas aparecerán aquí -->
+        </div>
+
+        <button class="btn btn-success" onclick="generatePDFFromGallery()">
+          📄 Generar y Guardar PDF
+        </button>
+
+        <div class="browser-download" id="browserDownloadGallery">
+          <p>
+            PDF generado.
+            <a href="#" class="download-link" id="downloadLinkGallery"
+              >Haz clic aquí para descargar</a
+            >
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="reports" class="tab-content">
+      <div class="form-card">
+        <h2>Mis Informes Guardados</h2>
+
+        <div class="reports-list" id="reportsList">
+          <!-- Los informes guardados aparecerán aquí -->
+          <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <p>No hay informes guardados todavía</p>
+            <p>Crea tu primer informe en la pestaña "Nuevo Reporte"</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="notification" id="notification"></div>
+
+    <script src="cordova.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script>
+      let photoData = null;
+      let galleryImages = [];
+      let isCordova = false;
+      let savedReports = JSON.parse(localStorage.getItem("savedReports")) || [];
+
+      function showNotification(message, isError = false) {
+        const notification = document.getElementById("notification");
+        notification.textContent = message;
+        notification.className = "notification";
+
+        if (isError) {
+          notification.classList.add("error");
+        }
+
+        notification.classList.add("show");
+
+        setTimeout(() => {
+          notification.classList.remove("show");
+        }, 3000);
+      }
+
+      function setupTabNavigation() {
+        const tabButtons = document.querySelectorAll(".tab-button");
+
+        tabButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            tabButtons.forEach((btn) => btn.classList.remove("active"));
+            this.classList.add("active");
+
+            const tabId = this.getAttribute("data-tab");
+            document.querySelectorAll(".tab-content").forEach((content) => {
+              content.classList.remove("active");
+            });
+            document.getElementById(tabId).classList.add("active");
+
+            // Si es la pestaña de informes, actualizar la lista
+            if (tabId === "reports") {
+              updateReportsList();
+            }
+          });
+        });
+      }
+
+      function setupGalleryInput() {
+        const galleryInput = document.getElementById("galleryInput");
+
+        galleryInput.addEventListener("change", function (e) {
+          const files = e.target.files;
+          processGalleryImages(files);
+          galleryInput.value = "";
+        });
+      }
+
+      function processGalleryImages(files) {
+        for (let file of files) {
+          if (!file.type.startsWith("image/")) {
+            showNotification("Solo se permiten archivos de imagen", true);
+            continue;
+          }
+
+          const reader = new FileReader();
+
+          reader.onload = function (e) {
+            galleryImages.push(e.target.result);
+            updateGalleryPreview();
+          };
+
+          reader.onerror = function () {
+            showNotification("Error al cargar la imagen", true);
+          };
+
+          reader.readAsDataURL(file);
+        }
+      }
+
+      function updateGalleryPreview() {
+        const galleryContainer = document.getElementById("imageGallery");
+        galleryContainer.innerHTML = "";
+
+        galleryImages.forEach((image, index) => {
+          const imageContainer = document.createElement("div");
+          imageContainer.className = "image-container";
+
+          const img = document.createElement("img");
+          img.src = image;
+          img.className = "gallery-image";
+          img.alt = `Imagen ${index + 1}`;
+
+          const removeBtn = document.createElement("button");
+          removeBtn.className = "remove-image";
+          removeBtn.innerHTML = "×";
+          removeBtn.onclick = (e) => {
+            e.stopPropagation();
+            removeGalleryImage(index);
+          };
+
+          imageContainer.appendChild(img);
+          imageContainer.appendChild(removeBtn);
+          galleryContainer.appendChild(imageContainer);
+        });
+      }
+
+      function removeGalleryImage(index) {
+        galleryImages.splice(index, 1);
+        updateGalleryPreview();
+      }
+
+      function takePhoto() {
+        if (!navigator.camera) {
+          showNotification(
+            "La cámara no está disponible en este dispositivo",
+            true
+          );
+          return;
+        }
+
+        navigator.camera.getPicture(
+          function (imageData) {
+            photoData = "data:image/jpeg;base64," + imageData;
+            const img = document.getElementById("photoPreview");
+            img.src = photoData;
+            img.style.display = "block";
+            showNotification("✅ Foto tomada exitosamente");
+          },
+          function (error) {
+            console.error("Error al tomar foto:", error);
+            showNotification("Error al tomar foto: " + error, true);
+          },
+          {
+            quality: 70,
+            destinationType: Camera.DestinationType.DATA_URL,
+            targetWidth: 800,
+            targetHeight: 800,
+            correctOrientation: true,
+          }
+        );
+      }
+
+      function getUrgencyBadge(urgency) {
+        switch (urgency) {
+          case "alta":
+            return '<span class="urgency-badge urgency-high">Alta</span>';
+          case "media":
+            return '<span class="urgency-badge urgency-medium">Media</span>';
+          default:
+            return '<span class="urgency-badge urgency-low">Baja</span>';
+        }
+      }
+
+      function saveReport(reportData) {
+        savedReports.unshift(reportData);
+        localStorage.setItem("savedReports", JSON.stringify(savedReports));
+        updateReportsList();
+      }
+
+      function updateReportsList() {
+        const reportsList = document.getElementById("reportsList");
+
+        if (savedReports.length === 0) {
+          reportsList.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">📋</div>
+              <p>No hay informes guardados todavía</p>
+              <p>Crea tu primer informe en la pestaña "Nuevo Reporte"</p>
+            </div>
+          `;
+          return;
+        }
+
+        reportsList.innerHTML = "";
+
+        savedReports.forEach((report, index) => {
+          const reportItem = document.createElement("div");
+          reportItem.className = "report-item";
+
+          const urgencyBadge = getUrgencyBadge(report.urgency);
+
+          reportItem.innerHTML = `
+            <div class="report-header">
+              <div class="report-title">${report.title} ${urgencyBadge}</div>
+              <div class="report-date">${report.date}</div>
+            </div>
+            <div class="report-details">
+              <div><strong>Sector:</strong> ${report.sector}</div>
+              <div>${report.description}</div>
+            </div>
+            <div class="report-actions">
+              <button class="action-btn view-btn" onclick="viewReport(${index})">Ver</button>
+              <button class="action-btn delete-btn" onclick="deleteReport(${index})">Eliminar</button>
+            </div>
+          `;
+
+          reportsList.appendChild(reportItem);
+        });
+      }
+
+      function viewReport(index) {
+        const report = savedReports[index];
+        showNotification(`Abriendo reporte: ${report.title}`);
+        // Aquí podrías implementar la funcionalidad para ver el PDF
+      }
+
+      function deleteReport(index) {
+        if (confirm("¿Estás seguro de que deseas eliminar este informe?")) {
+          savedReports.splice(index, 1);
+          localStorage.setItem("savedReports", JSON.stringify(savedReports));
+          updateReportsList();
+          showNotification("Informe eliminado");
+        }
+      }
+
+      async function generatePDF() {
+        const nombre = document.getElementById("nombre").value;
+        const descripcion = document.getElementById("descripcion").value;
+        const sector = document.getElementById("sector").value;
+        const urgencia = document.getElementById("urgencia").value;
+
+        if (!nombre || !descripcion || !sector) {
+          showNotification("Complete todos los campos.", true);
+          return;
+        }
+
+        if (!photoData) {
+          showNotification("Tome una foto primero.", true);
+          return;
+        }
+
+        await generatePDFWithData(
+          nombre,
+          descripcion,
+          sector,
+          urgencia,
+          [photoData],
+          "camera"
+        );
+      }
+
+      async function generatePDFFromGallery() {
+        const nombre = document.getElementById("nombreGallery").value;
+        const descripcion = document.getElementById("descripcionGallery").value;
+        const sector = document.getElementById("sectorGallery").value;
+        const urgencia = document.getElementById("urgenciaGallery").value;
+
+        if (!nombre || !descripcion || !sector) {
+          showNotification("Complete todos los campos.", true);
+          return;
+        }
+
+        if (galleryImages.length === 0) {
+          showNotification("Seleccione al menos una imagen.", true);
+          return;
+        }
+
+        await generatePDFWithData(
+          nombre,
+          descripcion,
+          sector,
+          urgencia,
+          galleryImages,
+          "gallery"
+        );
+      }
+
+      async function generatePDFWithData(
+        nombre,
+        descripcion,
+        sector,
+        urgencia,
+        images,
+        source
+      ) {
+        showNotification("🔄 Generando PDF...");
+
+        try {
+          const { jsPDF } = window.jspdf;
+          const pdf = new jsPDF();
+
+          // Contenido del PDF
+          pdf.setFontSize(16);
+          pdf.text("REPORTE DE INSPECCIÓN", 20, 20);
+
+          pdf.setFontSize(12);
+          pdf.text(`Fecha: ${new Date().toLocaleDateString()}`, 20, 35);
+          pdf.text(`Título: ${nombre}`, 20, 45);
+          pdf.text(`Sector: ${sector}`, 20, 55);
+          pdf.text(`Urgencia: ${urgencia}`, 20, 65);
+
+          // Descripción con manejo de múltiples líneas
+          const descLines = pdf.splitTextToSize(
+            `Descripción: ${descripcion}`,
+            170
+          );
+          pdf.text(descLines, 20, 80);
+
+          let yPosition = descLines.length * 6 + 90;
+
+          // Agregar imágenes
+          for (let i = 0; i < images.length; i++) {
+            if (yPosition > 240) {
+              pdf.addPage();
+              yPosition = 20;
+            }
+
+            try {
+              pdf.text(`Imagen ${i + 1}:`, 20, yPosition);
+              yPosition += 10;
+
+              pdf.addImage(images[i], "JPEG", 20, yPosition, 80, 80);
+              yPosition += 90;
+            } catch (imgError) {
+              console.error(`Error con imagen ${i + 1}:`, imgError);
+              pdf.text(`(Error cargando imagen ${i + 1})`, 20, yPosition);
+              yPosition += 20;
+            }
+          }
+
+          // Guardar el PDF
+          const fileName = "reporte_" + Date.now() + ".pdf";
+
+          // Guardar información del reporte
+          const reportData = {
+            title: nombre,
+            description: descripcion,
+            sector: sector,
+            urgency: urgencia,
+            date: new Date().toLocaleDateString(),
+            fileName: fileName,
+          };
+
+          saveReport(reportData);
+
+          if (isCordova) {
+            await savePDFToDevice(pdf, fileName);
+            } else {
+            // Fallback para navegador: generar PDF dibujando el layout para que coincida con el diseño
+            try {
+              await generatePDFWithLayout(reportData, images, fileName);
+              showNotification("✅ PDF generado en navegador");
+            } catch (e) {
+              console.warn('Error generando PDF con layout, abriendo vista de impresión como fallback:', e);
+              openPrintableReport(reportData, images);
+              try {
+                pdf.save(fileName);
+              } catch (err) {
+                console.warn('No se pudo descargar automáticamente el PDF:', err);
+              }
+              showNotification("✅ Abriendo vista de impresión");
+            }
+          }
+        } catch (error) {
+          console.error("Error generando PDF:", error);
+          showNotification("Error: " + error.message, true);
+        }
+      }
+
+      async function savePDFToDevice(pdf, fileName) {
+        return new Promise((resolve, reject) => {
+          try {
+            // Generar el PDF como base64
+            const pdfDataUri = pdf.output("datauristring");
+            const base64Data = pdfDataUri.split(",")[1];
+
+            // Verificar si PrintPDF está disponible
+            if (!window.plugins || !window.plugins.PrintPDF) {
+              throw new Error("PrintPDF plugin no disponible");
+            }
+
+            // Usar PrintPDF para imprimir/guardar
+            window.plugins.PrintPDF.print({
+              data: base64Data,
+              type: "Data",
+              title: fileName,
+              success: function (result) {
+                console.log("PrintPDF éxito:", result);
+                showNotification("✅ PDF generado exitosamente");
+                resolve(result);
+              },
+              error: function (error) {
+                console.error("PrintPDF error:", error);
+                showNotification("Error con PrintPDF: " + error.error, true);
+                reject(error);
+              },
+            });
+          } catch (error) {
+            console.error("Error en savePDFToDevice:", error);
+            // Fallback al método alternativo
+            savePDFWithFilePlugin(pdf, fileName).then(resolve).catch(reject);
+          }
+        });
+      }
+
+      // Método alternativo con file plugin
+      async function savePDFWithFilePlugin(pdf, fileName) {
+        return new Promise((resolve, reject) => {
+          try {
+            const pdfDataUri = pdf.output("datauristring");
+            const base64Data = pdfDataUri.split(",")[1];
+
+            window.resolveLocalFileSystemURL(
+              cordova.file.externalRootDirectory + "Download/",
+              function (dir) {
+                dir.getFile(
+                  fileName,
+                  { create: true },
+                  function (file) {
+                    file.createWriter(function (writer) {
+                      writer.onwriteend = function () {
+                        console.log("PDF guardado con file plugin");
+                        showNotification("✅ PDF guardado en Descargas!");
+                        resolve(file.toURL());
+                      };
+
+                      writer.onerror = function (e) {
+                        console.error("Error escribiendo archivo:", e);
+                        reject(e);
+                      };
+
+                      const binaryString = window.atob(base64Data);
+                      const bytes = new Uint8Array(binaryString.length);
+                      for (let i = 0; i < binaryString.length; i++) {
+                        bytes[i] = binaryString.charCodeAt(i);
+                      }
+                      const blob = new Blob([bytes], {
+                        type: "application/pdf",
+                      });
+                      writer.write(blob);
+                    }, reject);
+                  },
+                  reject
+                );
+              },
+              reject
+            );
+          } catch (error) {
+            reject(error);
+          }
+        });
+      }
+
+      // Inicialización cuando Cordova esté listo
+      document.addEventListener(
+        "deviceready",
+        function () {
+          console.log("Cordova está listo");
+          isCordova = true;
+          setupTabNavigation();
+          setupGalleryInput();
+          showNotification("Aplicación lista para usar");
+
+          // Verificar plugins disponibles
+          console.log("Camera available:", !!navigator.camera);
+          console.log("File plugin available:", !!cordova.file);
+          console.log("FileOpener2 available:", !!cordova.plugins.fileOpener2);
+        },
+        false
+      );
+
+      // Inicialización para navegador
+      document.addEventListener("DOMContentLoaded", function () {
+        setupTabNavigation();
+        setupGalleryInput();
+        updateReportsList();
+
+        if (window.cordova) {
+          console.log("Cordova detectado");
+          isCordova = true;
+        } else {
+          console.log("Ejecutando en navegador");
+          showNotification("Modo navegador activado");
+        }
+      });
+
+      function openPrintableReport(reportData, images) {
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+          showNotification('No se pudo abrir la ventana de impresión', true);
+          return;
+        }
+
+        const htmlParts = [];
+
+        htmlParts.push('<!doctype html><html><head><meta charset="utf-8" />');
+        htmlParts.push('<meta name="viewport" content="width=device-width,initial-scale=1"/>');
+        htmlParts.push('<title>Reporte - ' + (reportData.title || '') + '</title>');
+
+        // Incluir estilos inline (copia reducida de estilos de impresión)
+        htmlParts.push('<style>');
+        htmlParts.push('@page{size:A4;margin:12mm;} body{font-family: Arial, Helvetica, sans-serif;margin:0;padding:0;color:#222}');
+        htmlParts.push('.print-report{width:210mm;min-height:297mm;margin:0 auto;position:relative;background:white;box-sizing:border-box;padding:8mm 12mm 18mm 12mm;page-break-after:always}');
+        htmlParts.push('.print-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #000;padding-bottom:6px}');
+        htmlParts.push('.print-title{position:absolute;left:0;right:0;text-align:center;font-weight:700;font-size:20px}');
+        htmlParts.push('.print-sector-bar{margin-top:6px;height:20px;background:#c91212;color:white;text-align:center;line-height:20px;font-weight:700;border:2px solid #7a0505}');
+        htmlParts.push('.print-watermark{position:absolute;left:50%;top:50%;transform:translate(-50%,-45%);opacity:0.06;max-width:70%;max-height:70%;pointer-events:none}');
+        htmlParts.push('.print-content{margin-top:60px}');
+        htmlParts.push('.print-images img{display:block;margin:8px auto;max-width:160mm;height:auto;border:1px solid #ddd}');
+        htmlParts.push('.print-footer{position:absolute;left:12mm;right:12mm;bottom:12mm;border-top:1px solid #999;padding-top:6px;font-size:12px;display:flex;justify-content:space-between;align-items:center}');
+        htmlParts.push('.print-footer .center-note{position:absolute;left:50%;transform:translateX(-50%);bottom:6mm;font-weight:700}');
+        htmlParts.push('</style>');
+
+        htmlParts.push('</head><body>');
+
+        // Build a single report page (if many images, they will flow and paginate)
+        htmlParts.push('<div class="print-report">');
+        htmlParts.push('<div class="print-header">');
+        htmlParts.push('<div class="left"><img src="img/logo-BM-2.png" alt="BM" style="max-width:120px;height:auto"/></div>');
+        htmlParts.push('<div class="title-wrap"><div class="print-title">REPORTE DE INSPECCIÓN</div></div>');
+        // Right logo, try halliburton if exists
+        htmlParts.push('<div class="right"><img src="img/halliburton.png" alt="Halliburton" style="max-width:120px;height:auto"/></div>');
+        htmlParts.push('</div>');
+        htmlParts.push('<div class="print-sector-bar">' + (reportData.sector ? reportData.sector.toUpperCase() : 'SECTOR') + '</div>');
+
+        // Watermark (prefer image, fallback to large text)
+        htmlParts.push('<img class="print-watermark" src="img/logo-BM-2.png" alt="watermark" onerror="this.style.display=\'none\'"/>');
+
+        htmlParts.push('<div class="print-content">');
+        htmlParts.push('<table style="width:100%;border-collapse:collapse;margin-bottom:8px">');
+        htmlParts.push('<tr><td style="width:15%;font-weight:700">Código:</td><td style="width:35%">000</td><td style="width:15%;font-weight:700">Fecha:</td><td>' + (reportData.date || '') + '</td></tr>');
+        htmlParts.push('<tr><td style="font-weight:700">Descripción:</td><td colspan="3">' + (reportData.description || '') + '</td></tr>');
+        htmlParts.push('</table>');
+
+        // Images
+        htmlParts.push('<div class="print-images">');
+        for (let i = 0; i < images.length; i++) {
+          htmlParts.push('<img src="' + images[i] + '" alt="Imagen ' + (i + 1) + '"/>');
+        }
+        htmlParts.push('</div>');
+
+        htmlParts.push('</div>'); // print-content
+
+        // Footer table
+        htmlParts.push('<div class="print-footer">');
+        htmlParts.push('<div>000</div>');
+        htmlParts.push('<div style="text-align:right">Emitió: ' + (reportData.author || '') + '</div>');
+        htmlParts.push('<div class="center-note">HOJA 1 DE 1</div>');
+        htmlParts.push('</div>');
+
+        htmlParts.push('</div>'); // print-report
+
+        htmlParts.push('<script>window.onload=function(){setTimeout(()=>{window.print();setTimeout(()=>window.close(),200);},300)};<\/script>');
+        htmlParts.push('</body></html>');
+
+        printWindow.document.open();
+        printWindow.document.write(htmlParts.join(''));
+        printWindow.document.close();
+      }
+
+      async function generatePDFFromHTML(reportData, images, fileName) {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ unit: 'mm', format: 'a4' });
+
+        // Crear contenedor invisible con el HTML de impresión
+        const container = document.createElement('div');
+        container.style.position = 'absolute';
+        container.style.left = '-9999px';
+        container.style.top = '0';
+        container.style.width = '210mm';
+        container.style.minHeight = '297mm';
+        container.className = 'print-report';
+
+        // Construir HTML similar a openPrintableReport
+        const sectorText = reportData.sector ? reportData.sector.toUpperCase() : 'SECTOR';
+        const authorText = reportData.author || '';
+
+        let html = '';
+        html += '<div class="print-header">';
+        html += '<div class="left"><img src="img/logo-BM-2.png" alt="BM" style="max-width:120px;height:auto"/></div>';
+        html += '<div class="title-wrap"><div class="print-title">REPORTE DE INSPECCIÓN</div></div>';
+        html += '<div class="right"><img src="img/halliburton.png" alt="Halliburton" style="max-width:120px;height:auto" onerror="this.style.display=\'none\'"/></div>';
+        html += '</div>';
+        html += '<div class="print-sector-bar">' + sectorText + '</div>';
+        html += '<img class="print-watermark" src="img/logo-BM-2.png" alt="watermark" onerror="this.style.display=\'none\'"/>';
+        html += '<div class="print-content">';
+        html += '<table style="width:100%;border-collapse:collapse;margin-bottom:8px">';
+        html += '<tr><td style="width:15%;font-weight:700">Código:</td><td style="width:35%">000</td><td style="width:15%;font-weight:700">Fecha:</td><td>' + (reportData.date || '') + '</td></tr>';
+        html += '<tr><td style="font-weight:700">Descripción:</td><td colspan="3">' + (reportData.description || '') + '</td></tr>';
+        html += '</table>';
+
+        html += '<div class="print-images">';
+        for (let i = 0; i < images.length; i++) {
+          html += '<img src="' + images[i] + '" alt="Imagen ' + (i + 1) + '"/>';
+        }
+        html += '</div>';
+        html += '</div>';
+
+        html += '<div class="print-footer">';
+        html += '<div>000</div>';
+        html += '<div style="text-align:right">Emitió: ' + authorText + '</div>';
+        html += '<div class="center-note">HOJA 1 DE 1</div>';
+        html += '</div>';
+
+        container.innerHTML = html;
+        document.body.appendChild(container);
+
+        // Esperar a que las imágenes internas carguen (por si no son dataURL)
+        const imgs = container.querySelectorAll('img');
+        await Promise.all(Array.from(imgs).map((img) => {
+          return new Promise((res) => {
+            if (img.complete) return res();
+            img.onload = img.onerror = res;
+          });
+        }));
+
+        return new Promise((resolve, reject) => {
+          try {
+            pdf.html(container, {
+              x: 0,
+              y: 0,
+              html2canvas: { scale: 1, useCORS: true },
+              callback: function (doc) {
+                try {
+                  const totalPages = doc.getNumberOfPages();
+                  const pageWidth = doc.internal.pageSize.getWidth();
+                  const pageHeight = doc.internal.pageSize.getHeight();
+
+                  for (let i = 1; i <= totalPages; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(10);
+                    doc.setTextColor(0, 0, 0);
+                    const footerText = 'HOJA ' + i + ' DE ' + totalPages;
+                    doc.text(footerText, pageWidth / 2, pageHeight - 8, { align: 'center' });
+                  }
+
+                  doc.save(fileName);
+                  document.body.removeChild(container);
+                  resolve();
+                } catch (err) {
+                  document.body.removeChild(container);
+                  reject(err);
+                }
+              }
+            });
+          } catch (err) {
+            document.body.removeChild(container);
+            reject(err);
+          }
+        });
+      }
+
+      // Genera un PDF dibujando el layout para que coincida con el informe adjunto
+      async function generatePDFWithLayout(reportData, images, fileName) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 12; // mm
+
+        // Helpers
+        function getImageType(dataUrl) {
+          if (!dataUrl) return 'JPEG';
+          if (dataUrl.indexOf('data:image/png') === 0) return 'PNG';
+          return 'JPEG';
+        }
+
+        function loadImage(src) {
+          return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => resolve(img);
+            img.onerror = (e) => reject(e);
+            img.src = src;
+          });
+        }
+
+        async function drawHeader(currentDoc) {
+          try {
+            // left logo
+            try {
+              const leftImg = await loadImage('img/logo-BM-2.png');
+              const lw = 30; // mm
+              const lh = (leftImg.height / leftImg.width) * lw;
+              currentDoc.addImage(leftImg, getImageType(leftImg.src), margin, margin - 2, lw, lh);
+            } catch (e) {
+              // ignore
+            }
+
+            // right logo
+            try {
+              const rightImg = await loadImage('img/halliburton.png');
+              const rw = 30;
+              const rh = (rightImg.height / rightImg.width) * rw;
+              currentDoc.addImage(rightImg, getImageType(rightImg.src), pageWidth - margin - rw, margin - 2, rw, rh);
+            } catch (e) {
+              // ignore
+            }
+
+            // Title centered
+            currentDoc.setFontSize(16);
+            currentDoc.setFont(undefined, 'bold');
+            currentDoc.text('REPORTE DE INSPECCIÓN', pageWidth / 2, margin + 8, { align: 'center' });
+
+            // Red sector bar
+            const barY = margin + 12;
+            currentDoc.setFillColor('#c91212');
+            currentDoc.setDrawColor('#7a0505');
+            currentDoc.rect(margin, barY, pageWidth - margin * 2, 8, 'FD');
+            currentDoc.setTextColor('#ffffff');
+            currentDoc.setFontSize(10);
+            const sectorText = reportData.sector ? reportData.sector.toUpperCase() : 'SECTOR MANTENIMIENTO';
+            currentDoc.text(sectorText, pageWidth / 2, barY + 6, { align: 'center' });
+            currentDoc.setTextColor(0, 0, 0);
+
+            return barY + 8 + 4; // y position after header
+          } catch (err) {
+            console.warn('drawHeader error', err);
+            return margin + 25;
+          }
+        }
+
+        // create watermark canvas (to apply opacity) and return dataURL
+        async function watermarkDataUrl(src, desiredWidthMm) {
+          try {
+            const img = await loadImage(src);
+            const dpi = 96;
+            const pxPerMm = dpi / 25.4;
+            const desiredPx = Math.round(desiredWidthMm * pxPerMm);
+            const scale = desiredPx / img.width;
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            const ctx = canvas.getContext('2d');
+            ctx.globalAlpha = 0.06;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            return canvas.toDataURL('image/png');
+          } catch (e) {
+            return null;
+          }
+        }
+
+        // Load watermark once
+        const watermarkUrl = await (async () => {
+          try {
+            return await watermarkDataUrl('img/logo-BM-2.png', 150);
+          } catch (e) {
+            return null;
+          }
+        })();
+
+        // Start first page
+        let cursorY = await drawHeader(doc);
+
+        // Place watermark if available
+        if (watermarkUrl) {
+          try {
+            const wmType = getImageType(watermarkUrl);
+            // center watermark, width 150mm
+            const wmWidth = 150;
+            const wmHeight = (pageWidth > 0) ? (wmWidth * 0.4) : 100; // approximate
+            const wmX = (pageWidth - wmWidth) / 2;
+            const wmY = (pageHeight - wmHeight) / 2 - 10;
+            doc.addImage(watermarkUrl, wmType, wmX, wmY, wmWidth, wmHeight, undefined, 'FAST');
+          } catch (e) {
+            console.warn('watermark addImage failed', e);
+          }
+        }
+
+        // Content: table with code, fecha, descripcion
+        const contentStartY = cursorY + 4;
+        let y = contentStartY;
+
+        // Small table
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'bold');
+        doc.text('Código:', margin, y);
+        doc.setFont(undefined, 'normal');
+        doc.text('000', margin + 20, y);
+        doc.setFont(undefined, 'bold');
+        doc.text('Fecha:', pageWidth / 2 + 10, y);
+        doc.setFont(undefined, 'normal');
+        doc.text(reportData.date || new Date().toLocaleDateString(), pageWidth / 2 + 30, y);
+        y += 8;
+
+        doc.setFont(undefined, 'bold');
+        doc.text('Descripción:', margin, y);
+        doc.setFont(undefined, 'normal');
+        const descLines = doc.splitTextToSize(reportData.description || '', pageWidth - margin * 2);
+        doc.text(descLines, margin, y + 6);
+        y += descLines.length * 6 + 6;
+
+        // Place images one by one
+        for (let i = 0; i < images.length; i++) {
+          let imgSrc = images[i];
+          try {
+            const img = await loadImage(imgSrc);
+            const maxWidth = pageWidth - margin * 2; // mm
+            // compute dimensions in mm: convert px to mm using image.width px -> assume 96dpi -> mm = px * 25.4 / dpi
+            const dpi = 96;
+            const widthMm = (img.width * 25.4) / dpi;
+            const heightMm = (img.height * 25.4) / dpi;
+            let drawW = widthMm;
+            let drawH = heightMm;
+            if (drawW > maxWidth) {
+              const ratio = maxWidth / drawW;
+              drawW = drawW * ratio;
+              drawH = drawH * ratio;
+            }
+
+            // If not enough space, add page and redraw header + watermark
+            if (y + drawH + 20 > pageHeight - margin - 20) {
+              doc.addPage();
+              y = await drawHeader(doc);
+              if (watermarkUrl) {
+                try {
+                  const wmType = getImageType(watermarkUrl);
+                  const wmWidth = 150;
+                  const wmHeight = (pageWidth > 0) ? (wmWidth * 0.4) : 100;
+                  const wmX = (pageWidth - wmWidth) / 2;
+                  const wmY = (pageHeight - wmHeight) / 2 - 10;
+                  doc.addImage(watermarkUrl, wmType, wmX, wmY, wmWidth, wmHeight, undefined, 'FAST');
+                } catch (e) { /* ignore */ }
+              }
+            }
+
+            // center image horizontally
+            const x = (pageWidth - drawW) / 2;
+            const imgType = getImageType(img.src);
+            doc.addImage(img, imgType, x, y, drawW, drawH);
+            y += drawH + 8;
+          } catch (err) {
+            console.warn('Error cargando imagen para PDF:', err);
+            // write placeholder
+            if (y + 12 > pageHeight - margin - 20) {
+              doc.addPage();
+              y = await drawHeader(doc);
+            }
+            doc.setFontSize(10);
+            doc.text('(Error cargando imagen)', margin, y);
+            y += 10;
+          }
+        }
+
+        // Después de agregar todo, añadir footer y numeración
+        const totalPages = doc.getNumberOfPages();
+        for (let p = 1; p <= totalPages; p++) {
+          doc.setPage(p);
+          // footer line
+          const footerY = pageHeight - margin - 12;
+          doc.setDrawColor(150);
+          doc.setLineWidth(0.2);
+          doc.line(margin, footerY, pageWidth - margin, footerY);
+
+          // left code
+          doc.setFontSize(10);
+          doc.text('000', margin, footerY + 6);
+
+          // right emitió
+          doc.text('Emitió: ' + (reportData.author || ''), pageWidth - margin, footerY + 6, { align: 'right' });
+
+          // center page numbering
+          const footerText = 'HOJA ' + p + ' DE ' + totalPages;
+          doc.text(footerText, pageWidth / 2, footerY + 6, { align: 'center' });
+        }
+
+        // Guardar
+        doc.save(fileName);
+      }
+    </script>
+  </body>
+</html>

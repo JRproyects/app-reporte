@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.tuempresa.reportapp" version="1.0.0" xmlns="http://www.w3.org/ns/widgets">
+    <name>ReportApp</name>
+    <description>Aplicación móvil para crear informes con imágenes</description>
+    <author email="dev@tuempresa.com" href="http://tuempresa.com">Tu Nombre</author>
+    <content src="index.html" />
+    
+    <!-- Preferencias Android -->
+    <preference name="android-minSdkVersion" value="22" />
+    <preference name="android-targetSdkVersion" value="33" />
+    <preference name="Orientation" value="portrait" />
+    
+    <!-- Plugins necesarios -->
+<plugin name="cordova-plugin-file-opener2" />
+    <plugin name="cordova-plugin-file-transfer" />
+    <plugin name="cordova-plugin-camera" spec="^6.0.0" />
+    <plugin name="cordova-plugin-file" spec="^7.0.0" />
+    <plugin name="cordova-plugin-android-permissions" spec="^1.1.0" />
+</widget>
